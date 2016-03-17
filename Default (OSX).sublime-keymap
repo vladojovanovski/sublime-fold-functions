@@ -1,0 +1,3 @@
+[
+  { "keys": ["super+alt+k"], "command": "fold_functions" }
+]
