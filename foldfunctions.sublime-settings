@@ -1,0 +1,4 @@
+{
+    "select_to_unfold": true,
+    "fold_constructors": true
+}
