@@ -7,6 +7,12 @@ Default shortcut key is ``cmd+alt+k``. (``ctrl+alt+k`` on Windows)
 
 ## Additional features
 
-One thing that annoys me in Sublime Text is to press that tiny triangle to unfold code. An additional feature is added that opens unfolded code by double clicking (selecting) the folded part. If there's any problems or slowdowns with this, you can turn it off in the setttings.
+* ``select_to_unfold``: (on by default) One thing that annoys me in Sublime Text is to press that tiny triangle to unfold code. With this you can double click (which selects code) to open a folded block.
+* ``fold_constructors``: (on by default) The plugin will also fold object literal parameters inside constructors.
 
-The plugin will also fold object literal parameters inside constructors. This can be turned off in the settings if unwanted.
+## Requirements
+
+Make sure you have the latest version of Sublime Text 3 installed. As of writing, build 3126.
+The plugin makes use of Sublime's selectors to recognize the blocks with curly braces. Unfortunately, this keeps changing on every now and then (twice now since development of this plugin).
+
+No support for Sublime Text 2, sorry.
