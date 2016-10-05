@@ -27,8 +27,7 @@ class CursorListener(sublime_plugin.EventListener):
             return
 
         # print("cursor", view.sel()[0])
-        # braces = view.find_by_selector('meta.brace.curly.js')
-        braces = view.find_by_selector('punctuation.definition.block.js')
+        braces = view.find_by_selector('meta.brace.curly.js') + view.find_by_selector('punctuation.definition.block.js')
         hasUnfolded = False
         
         self.openBraces = []
@@ -56,8 +55,7 @@ class FoldFunctionsCommand(sublime_plugin.TextCommand):
     closedBraces = []
     def run(self, edit):
         view = self.view
-        # braces = view.find_by_selector('meta.brace.curly.js')
-        braces = view.find_by_selector('punctuation.definition.block.js')
+        braces = view.find_by_selector('meta.brace.curly.js') + view.find_by_selector('punctuation.definition.block.js')
         parameters = view.find_by_selector('punctuation.definition.parameters.end.js')
         constructors = view.find_by_selector('variable.function.constructor.js')
         self.openBraces = []
