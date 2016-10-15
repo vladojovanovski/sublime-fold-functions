@@ -57,7 +57,7 @@ class FoldFunctionsCommand(sublime_plugin.TextCommand):
         view = self.view
         braces = view.find_by_selector('meta.brace.curly.js') + view.find_by_selector('punctuation.definition.block.js')
         parameters = view.find_by_selector('punctuation.definition.parameters.end.js')
-        constructors = view.find_by_selector('variable.function.constructor.js')
+        constructors = view.find_by_selector('variable.function.constructor.js') + view.find_by_selector('meta.instance.constructor.js') + view.find_by_selector('meta.function-call.constructor.js')
         self.openBraces = []
         self.closedBraces = []
 
