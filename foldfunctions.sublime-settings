@@ -1,4 +1,5 @@
 {
     "select_to_unfold": true,
-    "fold_constructors": true
+    "fold_constructors": true,
+    "auto_fold": false
 }

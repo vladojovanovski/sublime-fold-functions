@@ -9,6 +9,7 @@ Default shortcut key is ``cmd+alt+k``. (``ctrl+alt+k`` on Windows)
 
 * ``select_to_unfold``: (on by default) One thing that annoys me in Sublime Text is to press that tiny triangle to unfold code. With this you can double click (which selects code) to open a folded block.
 * ``fold_constructors``: (on by default) The plugin will also fold object literal parameters inside constructors.
+* ``auto_fold``: (off by default) An experimental feature. Automatically folds while you move your cursor. 
 
 ## Requirements
 
