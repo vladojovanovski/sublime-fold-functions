@@ -58,6 +58,7 @@ def collectBraces (view):
     closedBraces = []
     # unfortunately sublime text doesn't have selectors for starting and closing braces
     # gonna have to search for the opening and closing braces myself
+    # TODO: since build 1326 or so there is meta.block.js
     for brace in braces:
         braceStr = view.substr(brace)
         if (braceStr == "{"):
@@ -73,7 +74,6 @@ def fold (view, edge):
 
     parameters = view.find_by_selector('punctuation.definition.parameters.end.js')
     constructors = view.find_by_selector('variable.function.constructor.js') + view.find_by_selector('meta.instance.constructor.js') + view.find_by_selector('meta.function-call.constructor.js')
-    conditionals = view.find_by_selector('meta.conditional.js')
     closeConstructors = bool(settings.get("fold_constructors", False))
     sels = view.sel()
 
@@ -99,11 +99,11 @@ def fold (view, edge):
         hasConstructor = False
         if closeConstructors:
             # bug: functions inside constructors can cause bugs
-            isConditional = False
-            for conditional in conditionals:
-                if left.intersects(conditional):
-                    isConditional = True
-            if (isConditional):
+            if (view.match_selector(left.a, 'meta.conditional.js')):
+                continue
+            if (view.match_selector(left.a, 'meta.for.js')):
+                continue
+            if (view.match_selector(left.a, 'meta.while.js')):
                 continue
             # search if left of the brace is a constructor
             for constructor in constructors:
