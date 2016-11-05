@@ -52,70 +52,33 @@ class CursorListener(sublime_plugin.EventListener):
                     view.unfold(region)
                     return
 
-def collectBraces (view):
-    braces = view.find_by_selector('meta.brace.curly.js') + view.find_by_selector('punctuation.definition.block.js')
-    openBraces = []
-    closedBraces = []
-    # unfortunately sublime text doesn't have selectors for starting and closing braces
-    # gonna have to search for the opening and closing braces myself
-    # TODO: since build 1326 or so there is meta.block.js
-    for brace in braces:
-        braceStr = view.substr(brace)
-        if (braceStr == "{"):
-            openBraces.append(brace.a)
-        elif braceStr == "}":
-            region = sublime.Region(openBraces.pop(), brace.b)
-            closedBraces.append(region)
-
-    return closedBraces
+def collectBlocks (view):
+    # collects function bodies
+    # huge problem: find_by_selector does not find nested scopes
+    bodies = view.find_by_selector('meta.block.js')
+    return bodies
 
 def fold (view, edge):
-    regions = collectBraces(view)
-
-    parameters = view.find_by_selector('punctuation.definition.parameters.end.js')
-    constructors = view.find_by_selector('variable.function.constructor.js') + view.find_by_selector('meta.instance.constructor.js') + view.find_by_selector('meta.function-call.constructor.js')
+    regions = collectBlocks(view)
     closeConstructors = bool(settings.get("fold_constructors", False))
     sels = view.sel()
 
     for region in regions:
-        # check if the brace regions are suitable for closing
-        # look at the characters left of the opening brace
-        left = sublime.Region(region.a - 2, region.a + 1)
-        leftStr = view.substr(left)
-        leftNoSpac = sublime.Region(region.a - 1, region.a + 1)
-        leftNoSpacStr = view.substr(leftNoSpac)
         # the cursor should not be here
         hasCursor = False
         for sel in sels:
             extraSel = sublime.Region(sel.a - edge, sel.a + edge)
             hasCursor = hasCursor or region.intersects(extraSel);
-        # left of region.a should be parameter list
-        hasParameters = False
-        for param in parameters:
-            if left.intersects(param):
-                hasParameters = True
-                break
-        # also close constructors...?
-        hasConstructor = False
-        if closeConstructors:
-            # bug: functions inside constructors can cause bugs
-            if (view.match_selector(left.a, 'meta.conditional.js')):
-                continue
-            if (view.match_selector(left.a, 'meta.for.js')):
-                continue
-            if (view.match_selector(left.a, 'meta.while.js')):
-                continue
-            # search if left of the brace is a constructor
-            for constructor in constructors:
-                if left.intersects(constructor):
-                    hasConstructor = True
-                    break
-
-        if (not hasCursor):
-            # there might or might not be a space -> function () {} vs function (){}
-            if ((leftStr == ") {" and hasParameters) or (leftNoSpacStr == "){" and hasParameters) or hasConstructor):
-                inner = sublime.Region(region.a + 1, region.b - 1);
-                view.fold(inner)
+        if hasCursor:
+            continue
+        # there might be a space between the parameters and block
+        innerStart = 1
+        firstChar = view.substr(sublime.Region(region.a, region.a + 1))
+        if firstChar == " ":
+            innerStart = 2
+        # fold the inner part without the braces
+        inner = sublime.Region(region.a + innerStart, region.b - 1);
+        view.fold(inner)
 
 class FoldFunctionsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
