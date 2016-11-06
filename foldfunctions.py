@@ -59,6 +59,7 @@ def collectBraces (view):
     # unfortunately sublime text doesn't have selectors for starting and closing braces
     # gonna have to search for the opening and closing braces myself
     # TODO: since build 1326 or so there is meta.block.js
+    # edit 2016/6/11: or not.... view.find_by_selector only returns outer regions, still need to look into this
     for brace in braces:
         braceStr = view.substr(brace)
         if (braceStr == "{"):
@@ -73,7 +74,6 @@ def fold (view, edge):
     regions = collectBraces(view)
 
     parameters = view.find_by_selector('punctuation.definition.parameters.end.js')
-    constructors = view.find_by_selector('variable.function.constructor.js') + view.find_by_selector('meta.instance.constructor.js') + view.find_by_selector('meta.function-call.constructor.js')
     closeConstructors = bool(settings.get("fold_constructors", False))
     sels = view.sel()
 
@@ -98,18 +98,13 @@ def fold (view, edge):
         # also close constructors...?
         hasConstructor = False
         if closeConstructors:
-            # bug: functions inside constructors can cause bugs
-            if (view.match_selector(left.a, 'meta.conditional.js')):
-                continue
-            if (view.match_selector(left.a, 'meta.for.js')):
-                continue
-            if (view.match_selector(left.a, 'meta.while.js')):
-                continue
-            # search if left of the brace is a constructor
-            for constructor in constructors:
-                if left.intersects(constructor):
-                    hasConstructor = True
-                    break
+            # check if it's an object literal inside a constructor
+            # the scope should end with meta.function-call.constructor.js meta.group.js meta.object-literal.js
+            scope = view.scope_name(region.a + 1)
+            scopeArray = scope.split()
+            count = len(scopeArray)
+            if (count > 2 and scopeArray[count - 1] == "meta.object-literal.js" and scopeArray[count - 2] == "meta.group.js"  and scopeArray[count - 3] == "meta.function-call.constructor.js"):
+                hasConstructor = True
 
         if (not hasCursor):
             # there might or might not be a space -> function () {} vs function (){}
