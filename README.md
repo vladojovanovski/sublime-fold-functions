@@ -3,7 +3,7 @@
 A plugin for Sublime Text 3 for Javascript code. This plugin folds all functions except where your cursor is. This effectively removes all out-of-scope contexts, reducing a lot of noise while programming in JavaScript. 
 Default shortcut key is ``cmd+alt+k``. (``ctrl+alt+k`` on Windows) 
 
-![Example gif](https://raw.githubusercontent.com/LuckyKat/sublime-fold-functions/master/image/example.gif "Fold all functions out of scope.")
+![](image/example.gif)
 
 
 ## Additional features
