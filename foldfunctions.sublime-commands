@@ -1,3 +1,4 @@
 [
-    { "caption": "Fold JS Functions", "command": "fold_functions" }
+    { "caption": "Fold JS Functions", "command": "fold_functions" },
+    { "caption": "Unfold All", "command": "unfold_functions" }
 ]

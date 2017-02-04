@@ -1,5 +1,7 @@
 {
     "select_to_unfold": true,
     "fold_constructors": false,
-    "auto_fold": false
+    "auto_fold": false,
+    "brace_selection": 0,
+    "fold_on_open": false
 }

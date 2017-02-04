@@ -15,6 +15,14 @@ def init_plugin():
 def plugin_loaded():
     init_plugin()
 
+class OpenListener(sublime_plugin.EventListener):
+    # fold on open
+    def on_load_async(self, view):
+        syntax = view.settings().get('syntax');
+        foldOnOpen = bool(settings.get("fold_on_open", False))
+        if (foldOnOpen and ("JavaScript" in syntax)):
+            fold(view, 0)
+
 class CursorListener(sublime_plugin.EventListener):
     # this listener checks if a folded region has been selected
     def on_selection_modified_async(self, view):
@@ -52,6 +60,7 @@ class CursorListener(sublime_plugin.EventListener):
                     view.unfold(region)
                     return
 
+
 def collectBraces (view):
     braces = view.find_by_selector('meta.brace.curly.js') + view.find_by_selector('punctuation.definition.block.js')
     openBraces = []
@@ -70,47 +79,76 @@ def collectBraces (view):
 
     return closedBraces
 
+def getFoldableRegion (regions, parameterIndex, view):
+    for region in regions:
+        if (region.a == parameterIndex):
+            return region
+    return 0
+
 def fold (view, edge):
     regions = collectBraces(view)
 
     parameters = view.find_by_selector('punctuation.definition.parameters.end.js')
     closeConstructors = bool(settings.get("fold_constructors", False))
+    # braceSelection: 0 = inner, 1 = outer, 2 = greedy outer
+    braceSelection = int(settings.get("brace_selection", 0))
     sels = view.sel()
 
-    for region in regions:
-        # check if the brace regions are suitable for closing
-        # look at the characters left of the opening brace
-        left = sublime.Region(region.a - 2, region.a + 1)
-        leftStr = view.substr(left)
-        leftNoSpac = sublime.Region(region.a - 1, region.a + 1)
-        leftNoSpacStr = view.substr(leftNoSpac)
+    # fold functions by matching parameter blocks and braces
+    for parameter in parameters:
+        # find the corresponding brace
+        index = parameter.b
+        while (index < view.size()):
+            char = view.substr(sublime.Region(index, index + 1))
+            index += 1
+            if (char == "{"):
+                # this index must correspond with one of the collected braces
+                break
+
+        region = getFoldableRegion(regions, index - 1, view)
+        if (region == 0):
+            # no braces found
+            continue
+        
         # the cursor should not be here
         hasCursor = False
         for sel in sels:
             extraSel = sublime.Region(sel.a - edge, sel.a + edge)
             hasCursor = hasCursor or region.intersects(extraSel);
-        # left of region.a should be parameter list
-        hasParameters = False
-        for param in parameters:
-            if left.intersects(param):
-                hasParameters = True
-                break
-        # also close constructors...?
-        hasConstructor = False
-        if closeConstructors:
+
+        if (not hasCursor):
+            # exclude braces
+            foldRegion = sublime.Region(region.a + 1, region.b - 1)
+            if (braceSelection == 1):
+                # include braces
+                foldRegion = sublime.Region(region.a, region.b)
+            if (braceSelection > 1):
+                # everything after the parameter list
+                foldRegion = sublime.Region(parameter.b, region.b)
+            view.fold(foldRegion)
+    
+    # fold constructors 
+    if closeConstructors:
+        for region in regions:
             # check if it's an object literal inside a constructor
             # the scope should end with meta.function-call.constructor.js meta.group.js meta.object-literal.js
             scope = view.scope_name(region.a + 1)
             scopeArray = scope.split()
             count = len(scopeArray)
             if (count > 2 and scopeArray[count - 1] == "meta.object-literal.js" and scopeArray[count - 2] == "meta.group.js"  and scopeArray[count - 3] == "meta.function-call.constructor.js"):
-                hasConstructor = True
+                # exclude braces
+                foldRegion = sublime.Region(region.a + 1, region.b - 1)
+                if (braceSelection == 1):
+                    # include braces
+                    foldRegion = sublime.Region(region.a, region.b)
+                view.fold(foldRegion)
 
-        if (not hasCursor):
-            # there might or might not be a space -> function () {} vs function (){}
-            if ((leftStr == ") {" and hasParameters) or (leftNoSpacStr == "){" and hasParameters) or hasConstructor):
-                inner = sublime.Region(region.a + 1, region.b - 1);
-                view.fold(inner)
+class UnfoldFunctionsCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        view = self.view
+        foldedRegions = view.folded_regions()
+        for region in foldedRegions:
+            view.unfold(region)
 
 class FoldFunctionsCommand(sublime_plugin.TextCommand):
     def run(self, edit):

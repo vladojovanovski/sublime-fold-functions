@@ -2,5 +2,9 @@
     {
         "caption": "Fold Functions",
         "command": "fold_functions"
+    },
+    {
+        "caption": "Unfold All",
+        "command": "unfold_functions"
     }
 ]
