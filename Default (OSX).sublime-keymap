@@ -1,3 +1,4 @@
 [
-  { "keys": ["super+alt+k"], "command": "fold_functions" }
+  { "keys": ["super+alt+k"], "command": "fold_functions" },
+  { "keys": ["super+alt+shift+k"], "command": "fold_args" },
 ]
