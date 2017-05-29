@@ -1,4 +1,5 @@
 import sublime, sublime_plugin
+import re
 
 settings = {}
 
@@ -143,15 +144,56 @@ def fold (view, edge):
                     foldRegion = sublime.Region(region.a, region.b)
                 view.fold(foldRegion)
 
+def unfold(view):
+    folded_regions = view.folded_regions()
+    for region in folded_regions:
+        view.unfold(region)
+
+def fold_args(view):
+    def _get_char(i):
+        return view.substr(sublime.Region(i, i + 1))
+
+    def _is_function_name_char(c):
+        return re.match(r'[a-zA-Z0-9_]', c)
+
+    def _sel_range(sel):
+        return range(min(sel.a, sel.b), max(sel.a, sel.b))
+
+    for sel in view.sel():
+        scope = 0
+        for i in _sel_range(sel):
+            prev_char = _get_char(i - 1) if i > 0 else None
+            if prev_char is None:
+                continue
+
+            if scope == 0 and not _is_function_name_char(prev_char):
+                continue
+
+            char = _get_char(i)
+            if char == '(':
+                if scope == 0:
+                    start = i
+                scope += 1
+            elif char == ')' and scope > 0:
+                scope -= 1
+                if scope == 0:
+                    view.fold(sublime.Region(start + 1, i))
+
 class UnfoldFunctionsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        view = self.view
-        foldedRegions = view.folded_regions()
-        for region in foldedRegions:
-            view.unfold(region)
+        unfold(self.view)
 
 class FoldFunctionsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         view = self.view
         fold(view, 0)
 
+class FoldArgsCommand(sublime_plugin.TextCommand):
+    def has_sel(self):
+        return any(abs(sel.b - sel.a) for sel in self.view.sel())
+
+    def run(self, edit):
+        if len(self.view.folded_regions()) and not self.has_sel():
+            unfold(self.view)
+        else:
+            fold_args(self.view)

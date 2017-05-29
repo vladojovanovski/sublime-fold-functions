@@ -14,7 +14,9 @@ There is an "Unfold All" command from the command palette. Furthermore, these op
 * ``fold_on_open``: (off by default) Folds upon opening a file.
 * ``brace_selection``: (0 by default) Which part of the braces to fold. 0 = only inner content of braces, 1 = include braces, 2 = greedy inclusion (folds everything starting from the parameter list) 
 * ``fold_constructors``: (off by default) The plugin will also fold object literal parameters inside constructors. For example: ``var myObj = new Constructor({...});``
-* ``auto_fold``: (off by default) An experimental feature. Automatically folds and unfolds while you move your cursor. 
+* ``auto_fold``: (off by default) An experimental feature. Automatically folds and unfolds while you move your cursor.
+
+Finally, the - admittedly unusual - Fold Args command (``cmd+alt+shift+k``) folds all function arguments in the selected code. This simplifies the view on the code and highlights the parts that are not yet "outsourced" to helper functions, which may give you some ideas for refactoring.
 
 ## Requirements
 

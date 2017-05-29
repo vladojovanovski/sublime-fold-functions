@@ -6,5 +6,9 @@
     {
         "caption": "Unfold All",
         "command": "unfold_functions"
+    },
+    {
+        "caption": "Fold Args",
+        "command": "fold_args"
     }
 ]
