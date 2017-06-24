@@ -20,9 +20,6 @@ Finally, the - admittedly unusual - Fold Args command (``cmd+alt+shift+k``) fold
 
 ## Requirements
 
-~~The functions must use 1TBS brace style, if the opening brace is on a new line, the functions won't be recognized.~~
-All brace styles are supported.
-
 Make sure you have the latest version of Sublime Text 3 installed. As of writing, build 3126.
 The plugin makes use of Sublime's selectors to recognize the blocks with curly braces. Unfortunately, this keeps changing on every now and then (twice now since development of this plugin).
 

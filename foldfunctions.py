@@ -142,7 +142,14 @@ def fold (view, edge):
                 if (braceSelection == 1):
                     # include braces
                     foldRegion = sublime.Region(region.a, region.b)
-                view.fold(foldRegion)
+                # the cursor should not be here
+                hasCursor = False
+                for sel in sels:
+                    extraSel = sublime.Region(sel.a - edge, sel.a + edge)
+                    hasCursor = hasCursor or foldRegion.intersects(extraSel);
+
+                if (not hasCursor):
+                    view.fold(foldRegion)
 
 def unfold(view):
     folded_regions = view.folded_regions()
