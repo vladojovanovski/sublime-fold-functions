@@ -63,7 +63,7 @@ class CursorListener(sublime_plugin.EventListener):
 
 
 def collectBraces (view):
-    braces = view.find_by_selector('meta.brace.curly.js') + view.find_by_selector('punctuation.definition.block.js')
+    braces = view.find_by_selector('meta.brace.curly.js') + view.find_by_selector('punctuation.definition.block.js') + view.find_by_selector('punctuation.section.block.js')
     openBraces = []
     closedBraces = []
     # unfortunately sublime text doesn't have selectors for starting and closing braces
@@ -89,7 +89,7 @@ def getFoldableRegion (regions, parameterIndex, view):
 def fold (view, edge):
     regions = collectBraces(view)
 
-    parameters = view.find_by_selector('punctuation.definition.parameters.end.js')
+    parameters = view.find_by_selector('punctuation.definition.parameters.end.js') + view.find_by_selector('punctuation.section.group.end.js')
     closeConstructors = bool(settings.get("fold_constructors", False))
     # braceSelection: 0 = inner, 1 = outer, 2 = greedy outer
     braceSelection = int(settings.get("brace_selection", 0))

@@ -1,0 +1,25 @@
+Sublime Fold Functions v1.0.7
+=============================
+
+Remove clutter by folding all Javascript functions.
+
+Default keybinding is cmd+alt+k (ctrl+alt+k on Windows).
+
+For settings and keybinding:
+Preferences -> Package Settings -> FoldJsFunctions -> Settings - User
+
+For more information or issues, go to github:
+https://github.com/LuckyKat/sublime-fold-functions
+
+#Changelog
+v1.0.8:
+* Fix for ST3 build 3143
+
+v1.0.7:
+* Fix folding object literals in constructors
+* Added fold arguments by mnieber
+
+v1.0.6:
+* Support for all brace styles.
+* Folded region can include braces or more with brace_selection option.
+* New fold_on_open option to instantly fold functions when opening files.
