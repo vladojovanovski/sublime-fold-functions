@@ -10,11 +10,16 @@ function named(a, b, c) {
     // bye
 }
 
+// folds arrow functions
+var arrow = () => { 
+    // bye
+};
+
 // folds constructors with object literals (with "fold_constructors": true)
 var constructed = new Anonymous({
     a: "bye",
     b: "bye",
-    c: outer = function () {
+    c: function () {
         var i = 0;
         var nested = function () {
             // bye
@@ -25,10 +30,11 @@ var constructed = new Anonymous({
 
         // should not fold conditionals or for loops
         if (nested()) {
+            // hi
             return;
         }
         for (i = 0; i < 10; ++i) {
-            console.log("bye");
+            console.log("hi");
         }
     }
 });
@@ -45,9 +51,10 @@ var outer = function () {
 
     // should not fold conditionals or for loops
     if (nested()) {
+        // hi
         return;
     }
     for (i = 0; i < 10; ++i) {
-        console.log("bye");
+        console.log("hi");
     }
 };

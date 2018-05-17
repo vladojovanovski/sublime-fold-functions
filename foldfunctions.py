@@ -63,15 +63,28 @@ class CursorListener(sublime_plugin.EventListener):
 
 
 def collectBraces (view):
-    braces = view.find_by_selector('meta.brace.curly.js') + view.find_by_selector('punctuation.definition.block.js') + view.find_by_selector('punctuation.section.block.js')
     openBraces = []
     closedBraces = []
     # unfortunately sublime text doesn't have selectors for starting and closing braces
     # gonna have to search for the opening and closing braces myself
     # TODO: since build 1326 or so there is meta.block.js
     # edit 2016/6/11: or not.... view.find_by_selector only returns outer regions, still need to look into this
+
+    # Sublime 3.1.1 b3176 presents punctuation.section.block.begin.js and punctuation.section.block.end.js
+    bracesOpen = view.find_by_selector('punctuation.section.block.begin.js')
+    bracesClosed = view.find_by_selector('punctuation.section.block.end.js')
+    if bracesOpen:
+        braces = bracesOpen + bracesClosed
+        # we require the opening and closing braces to be in the same sequence as they appear in text
+        braces.sort(key=lambda region: region.a)
+    else:
+        # pre build3176
+        braces = view.find_by_selector('meta.brace.curly.js') + view.find_by_selector('punctuation.definition.block.js') + view.find_by_selector('punctuation.section.block.js')
+
+
     for brace in braces:
         braceStr = view.substr(brace)
+
         if (braceStr == "{"):
             openBraces.append(brace.a)
         elif braceStr == "}":
@@ -89,7 +102,7 @@ def getFoldableRegion (regions, parameterIndex, view):
 def fold (view, edge):
     regions = collectBraces(view)
 
-    parameters = view.find_by_selector('punctuation.definition.parameters.end.js') + view.find_by_selector('punctuation.section.group.end.js')
+    parameters = view.find_by_selector('punctuation.definition.parameters.end.js') + view.find_by_selector('meta.function.declaration.js punctuation.section.group.end.js')
     closeConstructors = bool(settings.get("fold_constructors", False))
     # braceSelection: 0 = inner, 1 = outer, 2 = greedy outer
     braceSelection = int(settings.get("brace_selection", 0))
