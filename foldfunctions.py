@@ -79,7 +79,7 @@ def collectBraces (view):
         braces.sort(key=lambda region: region.a)
     else:
         # pre build3176
-        braces = view.find_by_selector('meta.brace.curly.js') + view.find_by_selector('punctuation.definition.block.js') + view.find_by_selector('punctuation.section.block.js')
+        braces = view.find_by_selector('meta.brace.curly.js') + view.find_by_selector('punctuation.definition.block.js') + view.find_by_selector('meta.function.declaration.js punctuation.section.group.end.js') + view.find_by_selector('punctuation.section.block.js')
 
 
     for brace in braces:
