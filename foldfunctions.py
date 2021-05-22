@@ -102,7 +102,7 @@ def getFoldableRegion (regions, parameterIndex, view):
 def fold (view, edge):
     regions = collectBraces(view)
 
-    parameters = view.find_by_selector('punctuation.definition.parameters.end.js') + view.find_by_selector('meta.function.declaration.js punctuation.section.group.end.js')
+    parameters = view.find_by_selector('punctuation.definition.parameters.end.js') + view.find_by_selector('meta.function-call.js punctuation.section.group.end.js')
     closeConstructors = bool(settings.get("fold_constructors", False))
     # braceSelection: 0 = inner, 1 = outer, 2 = greedy outer
     braceSelection = int(settings.get("brace_selection", 0))
